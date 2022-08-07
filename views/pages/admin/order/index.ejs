@@ -1,0 +1,155 @@
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <%- include('../../../partials/admin/navbar') %>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <%- include('../../../partials/admin/sidebar') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <h1 class="m-0">Orders</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="order-list" class="table table-bordered table-hover text-center">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Customer ID</th>
+                                        <th>Time</th>
+                                        <th>Delivery Address</th>
+                                        <th>Amount</th>
+                                        <th>Payment Method</th>
+                                        <th>Contact</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(var i = 0; i < orders.length; i++) { %>
+                                        <tr>
+                                            <td><%= orders[i].id %></td>
+                                            <td><%= orders[i].customer_id %></td>
+                                            <td><%= orders[i].time.toLocaleDateString("en-US") %></td>
+                                            <td><small><%= orders[i].address %></small></td>
+                                            <td>Tk &nbsp<%= orders[i].amount %></td>
+                                            <td><%= orders[i].pay_method === "COD" ? 'Cash on Delivery' : 'N/A' %></td>
+                                            <td><%= orders[i].contact %></td>
+                                            <td style="<%= helpers.formatStatusStyle(orders[i].status) %>">
+                                                <%= orders[i].status %>
+                                            </td>
+                                            <td>
+                                                <button class=".btn.btn-app edit-order" data-id="<%= orders[i].id %>"><i class="fas fa-edit"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.modal -->
+    <div class="modal fade" id="edit-order">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Order</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- form start -->
+                    <form id="edit-order-form">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Orderd Products</label>
+                                <table id="ordered-products" class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Qty</th>
+                                        <th>Unit</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <% if (locals.session.type === 'SA' || locals.session.type === 'S') { %>
+                                    <select class="form-control" name="status">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Assigned">Assigned</option>
+                                        <option value="In-progress">In-progress</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Failed">Failed</option>
+                                    </select>
+                                <% } else if (locals.session.type === 'DM') { %>
+                                    <select class="form-control" name="status">
+                                        <option value="Assigned">Assigned</option>
+                                        <option value="In-progress">In-progress</option>
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                <% } %>
+                                <small class="text-danger" id="status-val-err-msg-edit"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Assign To</label>
+                                <select class="form-control" name="assigned_to">
+                                    <% if (locals.session.type !== 'DM') { %>
+                                        <option value=""></option>
+                                    <% } %>
+                                    <% for(var i = 0; i < deliveryMen.length; i++) { %>
+                                        <option value="<%= deliveryMen[i].id %>"><%= deliveryMen[i].first_name + " " + deliveryMen[i].last_name %></option>
+                                    <% } %>
+                                </select>
+                                <small class="text-warning" id="deliveryman-val-err-msg-edit">Note: This is required except "Pending" status</small>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                            <input type="hidden" name="order_id">
+                            <button type="submit" class="btn btn-primary">Update Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+<!-- ./wrapper -->

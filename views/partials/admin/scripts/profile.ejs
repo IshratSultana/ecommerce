@@ -1,0 +1,85 @@
+<!-- jQuery -->
+<script src="/public/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/public/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/public/dist/js/demo.js"></script>
+<!-- Page specific script -->
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script>
+    $(function () {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        document.getElementById("file").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("profile-avatar").src = e.target.result;
+                // document.getElementById("image").style.width = "600px";
+                // document.getElementById("image").style.height = "300px";
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+
+        function doNecessaryTasksAfterSuccess(msg) {
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+            setTimeout(function () {
+                window.location.reload();
+            }, 2000)
+        }
+
+        $("#profile-form").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/profile/' + $('#profile-form input[name="id"]').val() + '/update',
+                type: 'PUT',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message)
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "email-exist":
+                                $("#email-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: "Something went wrong"
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+

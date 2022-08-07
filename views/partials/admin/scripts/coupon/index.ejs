@@ -1,0 +1,192 @@
+<!-- jQuery -->
+<script src="/public/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables  & Plugins -->
+<script src="/public/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/public/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/public/plugins/jszip/jszip.min.js"></script>
+<script src="/public/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="/public/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/public/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/public/dist/js/demo.js"></script>
+<!-- Page specific script -->
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- bootbox -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+<script>
+    $(function () {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        $('#coupon-list').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "columnDefs": [
+                {"orderable": false, "targets": 4},
+            ],
+            "order": [[0, "desc"]],
+            "initComplete": function () {
+                this.api().columns(3).every(function () {
+                    var column = this;
+                    var select = $('<select class="form-control"><option value="">Status</option></select>')
+                        .appendTo('#coupon-list_wrapper .col-md-6:eq(0)')
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+
+                            column
+                                .search(val ? '^' + val + '$' : '', true, false)
+                                .draw();
+                        });
+
+                    column.data().unique().sort().each(function (d, j) {
+                        select.append('<option value="' + d + '">' + d + '</option>')
+                    });
+                });
+            }
+        });
+
+        function doNecessaryTasksAfterSuccess(msg, eventType) {
+            if (eventType !== "delete") {
+                eventType === "create" ? $('#create-camp').modal('hide') : $('#edit-camp').modal('hide');
+            }
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+            setTimeout(function () {
+                window.location.reload();
+            }, 2000)
+        }
+
+        $("#add-camp-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/discounts',
+                type: 'POST',
+                data: $('#add-camp-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    }
+                }
+            });
+        });
+
+        /*
+        edit coupon functionality starts
+         */
+        $(".edit-coupon").click(function () {
+            const id = $(this).data("id");
+            console.log(id)
+            $.ajax({
+                type: 'GET',
+                url: '/api/admin/discounts/' + id,
+                success: function (res) {
+                    console.log(res)
+                    $('#edit-camp-form input[name="name"]').val(res.data.name)
+                    $('#edit-camp-form input[name="discount"]').val(res.data.discount)
+                    $('#edit-camp-form input[name="code"]').val(res.data.code)
+                    $("#edit-camp-form select[name='status']").val(res.data.status);
+                    $('#edit-camp-form input[name="min_amount"]').val(res.data.min_amount)
+                    $('#edit-camp-form input[name="camp_id"]').val(res.data.id)
+                    $('#edit-camp').modal('show');
+
+                }, error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+        /*
+        edit coupon functionality ends
+         */
+
+        /*
+        update coupon functionality starts
+         */
+        $("#edit-camp-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/discounts/' + $('#edit-camp-form input[name="camp_id"]').val() + '/update',
+                type: 'PUT',
+                data: $('#edit-camp-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "edit")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-edit").text(error.msg)
+                            })
+                        }
+                    }
+                }
+            });
+        });
+        /*
+        update coupon functionality ends
+         */
+
+        /*
+        delete coupon functionality starts
+         */
+        $(".del-coupon").click(function () {
+            var id = $(this).data("id");
+            bootbox.confirm("Are you sure?", function (result) {
+                if (result) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/admin/discounts/' + id + '/delete',
+                        success: function (res) {
+                            doNecessaryTasksAfterSuccess(res.message, "delete")
+                        }, error: function (err) {
+                            console.log(err);
+                        }
+                    });
+                }
+            });
+        });
+        /*
+        delete coupon functionality ends
+         */
+    });
+</script>

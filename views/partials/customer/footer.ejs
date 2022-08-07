@@ -1,0 +1,17 @@
+<footer id="colorlib-footer" role="contentinfo">
+    <div class="copy">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <% if(siteSettings){ %>
+                    <p><%= siteSettings.footer %></p>
+                <% } else{ %>
+                    <p>
+                    <span class="block">
+                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | E-Com
+                    </span>
+                    </p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</footer>

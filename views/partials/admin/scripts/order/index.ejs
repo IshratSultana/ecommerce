@@ -1,0 +1,146 @@
+<!-- jQuery -->
+<script src="/public/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables  & Plugins -->
+<script src="/public/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/public/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/public/plugins/jszip/jszip.min.js"></script>
+<script src="/public/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="/public/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/public/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/public/dist/js/demo.js"></script>
+<!-- Page specific script -->
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- bootbox -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+<script>
+    $(function () {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        $('#order-list').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "order": [[0, "desc"]],
+            "initComplete": function () {
+                this.api().columns(7).every(function () {
+                    var column = this;
+                    var select = $('<select class="form-control"><option value="">Status</option></select>')
+                        .appendTo('#order-list_wrapper .col-md-6:eq(0)')
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+
+                            column
+                                .search(val ? '^' + val + '$' : '', true, false)
+                                .draw();
+                        });
+
+                    column.data().unique().sort().each(function (d, j) {
+                        select.append('<option value="' + d + '">' + d + '</option>')
+                    });
+                });
+            }
+        });
+        function doNecessaryTasksAfterSuccess(msg, eventType) {
+            if (eventType !== "delete") {
+                eventType === "create" ? $('#create-camp').modal('hide') : $('#edit-order').modal('hide');
+            }
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+            setTimeout(function () {
+                window.location.reload();
+            }, 2000)
+        }
+        /*
+        edit order functionality starts
+         */
+        $(".edit-order").click(function () {
+            const id = $(this).data("id");
+            console.log(id)
+            $.ajax({
+                type: 'GET',
+                url: '/api/admin/order/' + id,
+                success: function (res) {
+                    console.log(res)
+                    let productsHtml = '';
+                    $('#edit-order-form #ordered-products tbody').html('');
+                    for (let i = 0; i < res.products.length; i++) {
+                        let tr = '<tr>';
+                        tr += `<td>${res.products[i].name}</td>`
+                        tr += `<td>${res.products[i].qty}</td>`
+                        tr += `<td>${res.products[i].unit}</td>`
+                        tr += `<td>${res.products[i].discount > 0 ? res.products[i].sale_price - (res.products[i].sale_price * (res.products[i].discount / 100))  : res.products[i].sale_price}</td>`
+                        tr += `<td>${res.products[i].discount > 0 ? (res.products[i].sale_price - (res.products[i].sale_price * (res.products[i].discount / 100)) * res.products[i].qty)  : (res.products[i].sale_price * res.products[i].qty)}</td>`
+                        tr += `</tr>`
+                        productsHtml += tr
+                    }
+                    $('#edit-order-form select[name="status"]').val(res.data.status);
+                    $('#edit-order-form select[name="assigned_to"]').val(res.data.assigned_to);
+                    $('#edit-order-form #ordered-products tbody').append(productsHtml);
+                    $('#edit-order-form input[name="order_id"]').val(res.data.id);
+                    $('#edit-order').modal('show');
+
+                }, error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+        /*
+        edit order functionality ends
+         */
+
+        /*
+        update order functionality starts
+         */
+        $("#edit-order-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/order/' + $('#edit-order-form input[name="order_id"]').val() + '/update',
+                type: 'PUT',
+                data: $('#edit-order-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "edit")
+                }
+                , error: function (err) {
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-edit").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.message !== "") {
+                        $('#status-val-err-msg-edit').text(`${err.responseJSON.message}`)
+                    }
+                }
+            });
+        });
+        /*
+        update order functionality ends
+        */
+    });
+</script>

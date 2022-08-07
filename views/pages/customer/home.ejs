@@ -1,0 +1,84 @@
+<!-- Navbar -->
+<%- include('../../partials/customer/navbar') %>
+<!-- /.navbar -->
+<aside id="colorlib-hero">
+    <div class="flexslider">
+        <ul class="slides">
+            <li style="background-image: url(<%= siteSettings ? '/public/uploads/' + siteSettings.banner_name : 'https://adlecltd.co.uk/wp-content/themes/adlec/images/nobanner.jpg' %>);">
+            </li>
+        </ul>
+    </div>
+</aside>
+<% if (newArrival.length > 0) { %>
+    <div class="colorlib-shop">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 text-center colorlib-heading">
+                    <h2><span>New Arrival</span></h2>
+                </div>
+            </div>
+            <div class="row">
+                <% for(var i = 0; i < newArrival.length; i++) { %>
+                    <div class="col-md-3 text-center">
+                        <div class="product-entry">
+                            <div class="product-img"
+                                 style="background-image: url(<%= '/public/uploads/' + newArrival[i].image_name %>);">
+                                <p class="tag"><span class="new">New</span></p>
+                                <div class="cart">
+                                    <p>
+                                        <span class="addtocart" id="<%= newArrival[i].id %>"><a href="javascript:void(0)"><i
+                                                        class="icon-shopping-cart"></i></a></span>
+                                        <span><a href="/products/<%= newArrival[i].id %>/detail"><i class="icon-eye"></i></a></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="desc">
+                                <h3><a href="/products/<%= newArrival[i].id %>/detail"><%= newArrival[i].name %></a></h3>
+                                <p class="price"><span>Tk &nbsp<%= newArrival[i].sale_price%></span></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+<% } %>
+<div class="colorlib-shop">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 text-center colorlib-heading">
+                <h2><span>Our Products</span></h2>
+            </div>
+        </div>
+        <% if(products.length > 0){ %>
+            <div class="row">
+                <% for(var i = 0; i < products.length; i++) { %>
+                    <div class="col-md-3 text-center">
+                        <div class="product-entry">
+                            <div class="product-img"
+                                 style="background-image: url(<%= '/public/uploads/' + products[i].image_name %>);">
+                                <p class="tag"><span class="new">New</span></p>
+                                <div class="cart">
+                                    <p>
+                                        <span class="addtocart" id="<%= products[i].id %>"><a href="javascript:void(0)"><i
+                                                        class="icon-shopping-cart"></i></a></span>
+                                        <span><a href="/products/<%= products[i].id %>/detail"><i class="icon-eye"></i></a></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="desc">
+                                <h3><a href="/products/<%= products[i].id %>/detail"><%= products[i].name %></a></h3>
+                                <p class="price"><span>Tk &nbsp<%= products[i].sale_price%></span></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else{ %>
+        <h1 class="text-center text-muted">No products available right now.</h1>
+        <% } %>
+    </div>
+</div>
+<!-- Footer -->
+<%- include('../../partials/customer/footer') %>
+<!-- /.Footer -->

@@ -1,0 +1,49 @@
+<!-- Navbar -->
+<%- include('../../partials/customer/navbar') %>
+<!-- /.navbar -->
+<div class="colorlib-shop">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post" class="colorlib-form" action="/login">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="email">E-mail Address</label>
+                                <input type="email" id="email" class="form-control" placeholder="Your email"
+                                       name="email"
+                                       value="<%= typeof errMsg != "undefined" || typeof valErrors != "undefined" ? data.email : "" %>">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="email">Password</label>
+                                <input type="password" id="password" class="form-control" placeholder="Your Password"
+                                       name="password"
+                                       value="<%= typeof errMsg != "undefined" || typeof valErrors != "undefined" ? data.password : "" %>">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <input type="submit" value="Login" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+                <% if (typeof valErrors != "undefined") { %>
+                    <% for (const [key, value] of Object.entries(valErrors)){ %>
+                        <div class="alert alert-danger mt-2">
+                            <strong><%= value.msg %></strong>
+                        </div>
+                    <% } %>
+                <% } %>
+                <% if (typeof errMsg != "undefined" ) { %>
+                    <div class="alert alert-danger mt-2">
+                        <strong><%= errMsg %></strong>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<%- include('../../partials/customer/footer') %>
+<!-- /.Footer -->

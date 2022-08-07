@@ -1,0 +1,183 @@
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <%- include('../../../partials/admin/navbar') %>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <%- include('../../../partials/admin/sidebar') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <h1 class="m-0">Discounts</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div align="right" class="pb-3">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#create-camp">Create Discounts
+                                    </button>
+                                </div>
+                                <table id="coupon-list" class="table table-bordered table-hover text-center">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Campaign Name</th>
+                                        <th>Code</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(var i = 0; i < coupons.length; i++) { %>
+                                        <tr>
+                                            <td><%= coupons[i].id %></td>
+                                            <td><%= coupons[i].name %></td>
+                                            <td><%= coupons[i].code %></td>
+                                            <td style="<%= coupons[i].status === "Active" ? "border-bottom: 4px solid #4AA746;" : "border-bottom: 4px solid red;" %>">
+                                                <%= coupons[i].status %>
+                                            </td>
+                                            <td>
+                                                <button class=".btn.btn-app edit-coupon" data-id="<%= coupons[i].id %>"><i class="fas fa-edit"></i></button>
+                                                <button
+                                                        class=".btn.btn-app del-coupon" data-id="<%= coupons[i].id %>"><i
+                                                            class="fas fa-trash text-danger"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <div class="modal fade" id="create-camp">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Campaign</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- form start -->
+                    <form id="add-camp-form">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Campaign Name</label>
+                                <input type="text" class="form-control" name="name">
+                                <small class="text-danger" id="name-val-err-msg"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Percent</label>
+                                <input type="number" min="1" class="form-control" name="discount">
+                                <small class="text-danger" id="discount-val-err-msg"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Code</label>
+                                <input type="text" class="form-control" name="code">
+                                <small class="text-danger" id="code-val-err-msg"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Minimum Amount Required</label>
+                                <input type="number" min="1" class="form-control" name="min_amount">
+                                <small class="text-danger" id="min_amount-val-err-msg"></small>
+                            </div>
+                            <input type="text" name="status" value="Active" hidden>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create Discounts</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <div class="modal fade" id="edit-camp">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Campaign</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- form start -->
+                    <form id="edit-camp-form">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Campaign Name</label>
+                                <input type="text" class="form-control" name="name">
+                                <small class="text-danger" id="name-val-err-msg-edit"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Percent</label>
+                                <input type="number" min="1" class="form-control" name="discount">
+                                <small class="text-danger" id="discount-val-err-msg-edit"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Code</label>
+                                <input type="text" class="form-control" name="code">
+                                <small class="text-danger" id="code-val-err-msg-edit"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Minimum Amount Required</label>
+                                <input type="number" min="1" class="form-control" name="min_amount">
+                                <small class="text-danger" id="min_amount-val-err-msg-edit"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" name="status">
+                                    <option value="Active">Active</option>
+                                    <option value="Revoked">Revoked</option>
+                                </select>
+                                <small class="text-danger" id="status-val-err-msg-edit"></small>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                            <input type="hidden" name="camp_id">
+                            <button type="submit" class="btn btn-primary">Update Campaign</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+<!-- ./wrapper -->

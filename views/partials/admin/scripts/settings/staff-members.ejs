@@ -1,0 +1,201 @@
+<!-- jQuery -->
+<script src="/public/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables  & Plugins -->
+<script src="/public/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/public/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/public/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/public/plugins/jszip/jszip.min.js"></script>
+<script src="/public/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="/public/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="/public/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/public/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/public/dist/js/demo.js"></script>
+<!-- Page specific script -->
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- bootbox -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+<script>
+    $(function () {
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        $('#staff-list').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "columnDefs": [
+                {"orderable": false, "targets": 6},
+            ],
+            "order": [[0, "desc"]],
+            "initComplete": function () {
+                this.api().columns(5).every(function () {
+                    var column = this;
+                    var select = $('<select class="form-control"><option value="">Role</option></select>')
+                        .appendTo('#staff-list_wrapper .col-md-6:eq(0)')
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+
+                            column
+                                .search(val ? '^' + val + '$' : '', true, false)
+                                .draw();
+                        });
+
+                    column.data().unique().sort().each(function (d, j) {
+                        select.append('<option value="' + d + '">' + d + '</option>')
+                    });
+                });
+            }
+        });
+
+        function doNecessaryTasksAfterSuccess(msg, eventType) {
+            if (eventType === "change") {
+                $('#change-site-settings').modal('hide');
+            } else if (eventType === "create") {
+                $('#add-staff-form').modal('hide');
+            } else {
+                $('#edit-staff-form').modal('hide');
+            }
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+            setTimeout(function () {
+                window.location.reload();
+            }, 2000)
+        }
+
+        $("#add-staff-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/staffs',
+                type: 'POST',
+                data: $('#add-staff-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "email-exist":
+                                $("#email-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        $(".edit-staff").click(function () {
+            const id = $(this).data("id");
+            console.log(id)
+            $.ajax({
+                type: 'GET',
+                url: '/api/admin/staffs/' + id,
+                success: function (res) {
+                    // console.log(res)
+                    $('#edit-staff-form input[name="first_name"]').val(res.data.first_name);
+                    $('#edit-staff-form input[name="last_name"]').val(res.data.last_name);
+                    $("#edit-staff-form select[name='code']").val(res.data.code);
+                    $('#edit-staff-form input[name="number"]').val(res.data.number);
+                    $('#edit-staff-form input[name="email"]').val(res.data.email);
+                    $('#edit-staff-form input[name="staff_id"]').val(res.data.id)
+                    $("#edit-staff-form select[name='type']").val(res.data.type);
+                    $('#edit-staff-modal').modal('show');
+
+                }, error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+
+        $("#edit-staff-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/staffs/' + $('#edit-staff-form input[name="staff_id"]').val() + '/update',
+                type: 'PUT',
+                data: $('#edit-staff-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "edit")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-edit").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "email-exist":
+                                $("#email-val-err-msg-edit").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        $(".del-staff").click(function () {
+            var id = $(this).data("id");
+            bootbox.confirm("Are you sure?", function (result) {
+                if (result) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/admin/staffs/' + id + '/delete',
+                        success: function (res) {
+                            doNecessaryTasksAfterSuccess(res.message, "delete")
+                        }, error: function (err) {
+                            console.log(err);
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>

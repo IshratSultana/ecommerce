@@ -1,0 +1,74 @@
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <%- include('../../../partials/admin/navbar') %>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <%- include('../../../partials/admin/sidebar') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <h1 class="m-0">Customers</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="customer-list" class="table table-bordered table-hover text-center">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Contacts</th>
+                                        <th>Total Order</th>
+                                        <th>Total Amount</th>
+                                        <th>Joining Date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(var i = 0; i < customers.length; i++) { %>
+                                        <tr>
+                                            <td><%= customers[i].id %></td>
+                                            <td>
+                                                <img src="<%= customers[i].avatar === null ? 'https://pixselo.com/wp-content/uploads/2018/03/dummy-placeholder-image-400x400.jpg' : '/public/uploads/' + customers[i].avatar %>"
+                                                     class="rounded-circle" alt="Cinque Terre"
+                                                     style="width: 50px; height: 50px;"></td>
+                                            <td><%= customers[i].first_name + ' ' + customers[i].last_name %></td>
+                                            <td><%= customers[i].code + customers[i].number %></td>
+                                            <td><%= customers[i].NumberOfOrders %></td>
+                                            <td>Tk &nbsp<%= customers[i].totalOrderAmount.toFixed(2) %></td>
+                                            <td><small><%= customers[i].joining_date.toLocaleDateString("en-US") %></small></td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+</div>
+<!-- ./wrapper -->

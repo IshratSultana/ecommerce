@@ -1,0 +1,66 @@
+<script src="../../../../public/assets-customer/js/jquery.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.easing.1.3.js"></script>
+
+<script src="../../../../public/assets-customer/js/bootstrap.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.waypoints.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.flexslider-min.js"></script>
+
+<script src="../../../../public/assets-customer/js/owl.carousel.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.magnific-popup.min.js"></script>
+<script src="../../../../public/assets-customer/js/magnific-popup-options.js"></script>
+
+<script src="../../../../public/assets-customer/js/bootstrap-datepicker.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.stellar.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/main.js"></script>
+<script>
+    $(document).ready(function(){
+
+        var quantitiy=0;
+        $('.quantity-right-plus').click(function(e){
+
+            // Stop acting like a button
+            e.preventDefault();
+            // Get the field name
+            var quantity = parseInt($('#quantity').val());
+
+            // If is not undefined
+
+            $('#quantity').val(quantity + 1);
+
+
+            // Increment
+
+        });
+
+        $('.quantity-left-minus').click(function(e){
+            // Stop acting like a button
+            e.preventDefault();
+            // Get the field name
+            var quantity = parseInt($('#quantity').val());
+
+            // If is not undefined
+
+            // Increment
+            if(quantity>0){
+                $('#quantity').val(quantity - 1);
+            }
+        });
+
+    });
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-23581568-13');
+</script>
+<script defer src="../../../../public/assets-customer/js/static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"605a18959bc7e9af","version":"2020.12.2","si":10}'></script>

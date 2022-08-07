@@ -1,0 +1,190 @@
+<!-- Navbar -->
+<%- include('../../partials/customer/navbar') %>
+<!-- /.navbar -->
+<aside id="colorlib-hero" class="breadcrumbs">
+    <div class="flexslider">
+        <ul class="slides">
+            <li style="background-image: url(../../../public/assets-customer/images/cover-img-1.jpg);">
+                <div class="overlay"></div>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3 col-sm-12 col-xs-12 slider-text">
+                            <div class="slider-text-inner text-center">
+                                <h1>Checkout</h1>
+                                <h2 class="bread"><span><a href="index.html">Home</a></span> <span><a href="cart.html">Shopping Cart</a></span>
+                                    <span>Checkout</span></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</aside>
+<div class="colorlib-shop">
+    <div class="container">
+        <div class="row row-pb-md">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="process-wrap">
+                    <div class="process text-center active">
+                        <p><span>01</span></p>
+                        <h3>Shopping Cart</h3>
+                    </div>
+                    <div class="process text-center active">
+                        <p><span>02</span></p>
+                        <h3>Checkout</h3>
+                    </div>
+                    <div class="process text-center">
+                        <p><span>03</span></p>
+                        <h3>Order Complete</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-7" id="billing-address">
+                <form method="post" class="colorlib-form" id="billing-address-form">
+                    <input type="hidden" name="customer_id"
+                           value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.id : 0 %>">
+                    <h2>Billing Details</h2>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label for="fname">First Name</label>
+                                <input type="text" id="fname" class="form-control" name='first_name'
+                                       placeholder="Your firstname"
+                                       value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.first_name : '' %>" <%= locals.anyLoggedUser.isLoggedIn ? 'readonly' : '' %>>
+                                <small class="text-danger" id="first_name-val-err-msg"></small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lname">Last Name</label>
+                                <input type="text" id="lname" class="form-control" placeholder="Your lastname"
+                                       name="last_name"
+                                       value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.last_name : '' %>" <%= locals.anyLoggedUser.isLoggedIn ? 'readonly' : '' %>>
+                                <small class="text-danger" id="last_name-val-err-msg"></small>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="fname">Address</label>
+                                <input type="text" id="address" class="form-control" placeholder="Enter Your Address"
+                                       name="address"
+                                       value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.address : '' %>" <%= locals.anyLoggedUser.isLoggedIn ? 'readonly' : '' %>>
+                            </div>
+                            <small class="text-danger" id="address-val-err-msg"></small>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="email">E-mail Address</label>
+                                <input type="email" id="email" class="form-control" placeholder="Your email"
+                                       name="email"
+                                       value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.email : '' %>" <%= locals.anyLoggedUser.isLoggedIn ? 'readonly' : '' %>>
+                            </div>
+                            <small class="text-danger" id="email-val-err-msg"></small>
+                        </div>
+                        <% if (!locals.anyLoggedUser.isLoggedIn) { %>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="email">Password</label>
+                                    <input type="password" id="password" class="form-control" placeholder="Your Password"
+                                           name="password"
+                                           value="">
+                                </div>
+                                <small class="text-danger" id="password-val-err-msg"></small>
+                            </div>
+                        <% } %>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="country">Select Country</label>
+                                    <div class="form-field">
+                                        <i class="icon icon-arrow-down3"></i>
+                                        <% if (locals.anyLoggedUser.isLoggedIn) { %>
+                                            <input type="hidden" name="code"
+                                                   value="<%= locals.anyLoggedUser.profileInfo.code %>">
+                                        <% } %>
+                                        <select id="code" <%= locals.anyLoggedUser.isLoggedIn ? "disabled" : "" %> name="<%= locals.anyLoggedUser.isLoggedIn ? "" : "code" %>"
+                                                class="form-control">
+                                            <% countryCodeWithNameAndFlagList.forEach(function(countryCodeWithNameAndFlag) { %>
+                                                <option value="<%= countryCodeWithNameAndFlag.number %>" <%= locals.anyLoggedUser.isLoggedIn && locals.anyLoggedUser.profileInfo.code === countryCodeWithNameAndFlag.number ? 'selected' : '' %>> <%= countryCodeWithNameAndFlag.name %>
+                                                    (<%= countryCodeWithNameAndFlag.number %>)
+                                                </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="Phone">Phone Number</label>
+                                <input type="text" id="number" class="form-control" placeholder="Your number"
+                                       name="number"
+                                       value="<%= locals.anyLoggedUser.isLoggedIn ? locals.anyLoggedUser.profileInfo.number : '' %>" <%= locals.anyLoggedUser.isLoggedIn ? 'readonly' : '' %>>
+                                <small class="text-danger" id="number-val-err-msg"></small>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             style="display: <%= locals.anyLoggedUser.isLoggedIn ? 'none' : 'block' %>">
+                            <div class="col-md-12">
+                                <div class="radio">
+                                    <label><input type="radio" name="type">Create an Account? </label>
+                                </div>
+                                <small class="text-danger" id="type-val-err-msg"></small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-5">
+                <div class="cart-detail">
+                    <h2>Cart Total</h2>
+                    <ul>
+                        <li>
+                            <span>Subtotal</span> <span id="sub_total">_</span>
+                            <!--                            <ul>
+                                                            <li><span>1 x Product Name</span> <span>$99.00</span></li>
+                                                            <li><span>1 x Product Name</span> <span>$78.00</span></li>
+                                                        </ul>-->
+                        </li>
+                        <li><span>Shipping</span> <span id="shipping">_</span></li>
+                        <li><span>Order Total</span> <span id="order_total">_</span></li>
+                    </ul>
+                </div>
+                <div class="cart-detail">
+                    <h2>Payment Method</h2>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="radio">
+                                <label><input type="radio" id="cod" name="cod">Cash on Delivery</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" id="cod" name="cod">Bkash</label>
+                            </div>
+                            <small class="text-danger" id="cod-val-err-msg"></small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="tNc" name="tNc"> I have read and accept the terms and
+                                    conditions</label>
+                            </div>
+                            <small class="text-danger" id="tNc-val-err-msg"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><a href="javascript:void(0)" class="btn btn-primary" id="placeOrder">Place an order</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="gototop js-top">
+    <a href="#" class="js-gotop"><i class="icon-arrow-up2"></i></a>
+</div>
+<!-- Footer -->
+<%- include('../../partials/customer/footer') %>
+<!-- /.Footer -->

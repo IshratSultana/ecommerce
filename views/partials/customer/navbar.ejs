@@ -1,0 +1,43 @@
+<nav class="colorlib-nav" role="navigation" style="background-color: #FFFFFF">
+    <div class="top-menu">
+        <div class="container">
+            <div class="row" style="display: flex; align-items: center">
+                <div class="col-xs-2">
+                    <div id="colorlib-logo"><img
+                                src="<%= siteSettings ? '/public/uploads/' + siteSettings.logo_name : 'https://winmagictoys.com/wp-content/uploads/2018/09/dummy-logo.png' %>"
+                                class="rounded-circle" alt="Site logo" style="width: 100px; height: 100px;"></div>
+                </div>
+                <div class="col-xs-10 text-right menu-1">
+                    <ul>
+                        <li class="<%= url === '/' ? 'active' : '' %>"><a href="/">Home</a></li>
+                        <li class="has-dropdown <%= url === '/shop' ? 'active' : '' %>">
+                            <a href="/shop">Shop</a>
+                            <ul class="dropdown">
+                                <li><a href="/cart">Shipping Cart</a></li>
+                                <li><a href="/checkout">Checkout</a></li>
+                                <li><a href="/order-complete">Order Complete</a></li>
+                            </ul>
+                        </li>
+
+                        <!--                        <li class="<%= url === '/cart' ? 'active' : '' %>"><a href="/cart"><i class="icon-shopping-cart"></i> Cart <span id="numOfProductsIntoCart">[0]</span></a></li>-->
+                        <li class="<%= url === '/cart' ? 'active' : '' %>"><a href="/cart"><i
+                                    class="icon-shopping-cart"></i> Cart</a></li>
+                        <% if (locals.anyLoggedUser.isLoggedIn) { %>
+                            <li class="has-dropdown <%= url === '/profile' ? 'active' : '' %>">
+                                <a href="/profile">
+                                    <%= locals.anyLoggedUser.profileInfo.first_name + ' ' +
+                                        locals.anyLoggedUser.profileInfo.last_name %>
+                                </a>
+                                <ul class="dropdown">
+                                    <li><a href="/logout">Logout</a></li>
+                                </ul>
+                            </li>
+                            <% } else { %>
+                                <li><a href="/login">Login</a></li>
+                                <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

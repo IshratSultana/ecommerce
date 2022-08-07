@@ -1,0 +1,294 @@
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <%- include('../../../partials/admin/navbar') %>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <%- include('../../../partials/admin/sidebar') %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <h1 class="m-0">Products</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div align="right" class="pb-3">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#add-prod">Add Product
+                                    </button>
+                                </div>
+                                <table id="prod-list" class="table table-bordered table-hover text-center text-center">
+                                    <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Unit</th>
+                                        <th>Price</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(var i = 0; i < products.length; i++) { %>
+                                        <tr>
+                                            <td><%= products[i].id %></td>
+                                            <td>
+                                                <img src="<%= '/public/uploads/' + products[i].image_name %>"
+                                                     class="rounded-circle" alt="Cinque Terre"
+                                                     style="width: 50px; height: 50px;"></td>
+                                            <td><%= products[i].name %></td>
+                                            <td><%= products[i].type %></td>
+                                            <td><%= products[i].unit %></td>
+                                            <td><%= products[i].sale_price %></td>
+                                            <td>
+                                                <button class=".btn.btn-app edit-prod" data-id="<%= products[i].id %>"><i
+                                                            class="fas fa-edit"></i></button>
+                                                <button
+                                                        class=".btn.btn-app del-prod" data-id="<%= products[i].id %>"><i
+                                                            class="fas fa-trash text-danger"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <div class="modal fade" id="add-prod">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Product</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- form start -->
+                    <form id="add-product-form">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control" name="name">
+                                        <small class="text-danger" id="name-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <textarea class="form-control" name="description"></textarea>
+                                        <small class="text-danger" id="description-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Unit</label>
+                                        <input type="text" class="form-control" name="unit">
+                                        <small class="text-danger" id="unit-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Price</label>
+                                        <input type="number" min="1" class="form-control" name="price">
+                                        <small class="text-danger" id="price-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sale Price</label>
+                                        <input type="number" class="form-control" name="sale_price" min="1">
+                                        <small class="text-danger" id="sale_price-val-err-msg"></small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>Discount In Percent</label>
+                                        <input type="number" min="0" class="form-control" name="discount">
+                                        <small class="text-danger" id="discount-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product Quantity</label>
+                                        <input type="number" min="1" class="form-control" name="qty">
+                                        <small class="text-danger" id="qty-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <select class="form-control" name="main_category_id">
+                                            <option value="">Choose one</option>
+                                            <% for(var i = 0; i < parents.length; i++) { %>
+                                                <option value="<%= parents[i].id %>"><%= parents[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                        <small class="text-danger" id="main_category_id-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select class="form-control" name="category_id">
+                                            <option value="">Choose one</option>
+                                            <% for(var i = 0; i < sub_categories.length; i++) { %>
+                                                <option value="<%= sub_categories[i].id %>"><%= sub_categories[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                        <small class="text-danger" id="category_id-val-err-msg"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product Image</label>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="file" id="file"
+                                                       accept="image/*">
+                                                <label class="custom-file-label">Choose file</label>
+                                            </div>
+                                        </div>
+                                        <small class="text-danger" id="file-val-err-msg"></small>
+                                        <div class="mt-4">
+                                            <img id="image" src="#" class="rounded mx-auto d-block img-fluid"
+                                                 alt="Product image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div class="modal fade" id="edit-prod">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Product</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- form start -->
+                    <form id="edit-product-form">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control" name="name">
+                                        <small class="text-danger" id="name-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <textarea class="form-control" name="description"></textarea>
+                                        <small class="text-danger" id="description-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Unit</label>
+                                        <input type="text" class="form-control" name="unit">
+                                        <small class="text-danger" id="unit-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Price</label>
+                                        <input type="number" min="1" class="form-control" name="price">
+                                        <small class="text-danger" id="price-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sale Price</label>
+                                        <input type="number" class="form-control" name="sale_price" min="1">
+                                        <small class="text-danger" id="sale_price-val-err-msg-edit"></small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>Discount In Percent</label>
+                                        <input type="number" min="0" class="form-control" name="discount">
+                                        <small class="text-danger" id="discount-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product Quantity</label>
+                                        <input type="number" min="1" class="form-control" name="qty">
+                                        <small class="text-danger" id="qty-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <select class="form-control" name="main_category_id">
+                                            <option value="">Choose one</option>
+                                            <% for(var i = 0; i < parents.length; i++) { %>
+                                                <option value="<%= parents[i].id %>"><%= parents[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                        <small class="text-danger" id="main_category_id-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select class="form-control" name="category_id">
+                                            <option value="">Choose one</option>
+                                            <% for(var i = 0; i < sub_categories.length; i++) { %>
+                                                <option value="<%= sub_categories[i].id %>"><%= sub_categories[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                        <small class="text-danger" id="category_id-val-err-msg-edit"></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product Image</label>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="file" id="file-edit"
+                                                       accept="image/*">
+                                                <label class="custom-file-label">Choose file</label>
+                                            </div>
+                                        </div>
+                                        <small class="text-danger" id="file-val-err-msg"></small>
+                                        <div class="mt-4">
+                                            <img id="image-edit" src="#" class="rounded mx-auto d-block img-fluid"
+                                                 alt="Product image">
+                                        </div>
+                                        <input type="hidden" name="uploaded_img_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                            <input type="hidden" name="product_id">
+                            <button type="submit" class="btn btn-primary">Edit Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+<!-- ./wrapper -->

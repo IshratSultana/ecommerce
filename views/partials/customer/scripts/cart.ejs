@@ -1,0 +1,265 @@
+<script src="../../../../public/assets-customer/js/jquery.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.easing.1.3.js"></script>
+
+<script src="../../../../public/assets-customer/js/bootstrap.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.waypoints.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.flexslider-min.js"></script>
+
+<script src="../../../../public/assets-customer/js/owl.carousel.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.magnific-popup.min.js"></script>
+<script src="../../../../public/assets-customer/js/magnific-popup-options.js"></script>
+
+<script src="../../../../public/assets-customer/js/bootstrap-datepicker.js"></script>
+
+<script src="../../../../public/assets-customer/js/jquery.stellar.min.js"></script>
+
+<script src="../../../../public/assets-customer/js/main.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'UA-23581568-13');
+
+    $(document).ready(function () {
+        // console.log("ready!");
+
+        function hideLoader() {
+            // console.log('HIDING LOADER')
+            $('.wrapper').css('display', 'none');
+            readyCartItems()
+        }
+
+        function showLoader() {
+            // console.log('HIDING LOADER')
+            $('.wrapper').css('display', 'block');
+            // readyCartItems()
+        }
+
+        function doTaskWhenCartEmpty() {
+            $('#cart-detail').html('<h1 class="text-center text-muted">You cart is empty!<small> Shop something.</h1>')
+            $('#sub_total').text('_')
+            $('#delivery_charge').text('_')
+            $('#discount').text('_')
+            $('#total').text('_')
+            $('#additional-things').css('display', 'none')
+        }
+
+        function readyCartItems() {
+            let cartItems = JSON.parse(localStorage.getItem('cart'))
+            const itemsInCart = cartItems['products']
+            if (Object.keys(itemsInCart).length > 0) {
+                let cartHTML = '';
+                const headHTML = '<div class="product-name"><div class="one-forth text-center"><span>Product Details</span></div><div class="one-eight text-center"><span>Price</span> </div> <div class="one-eight text-center"> <span>Quantity</span> </div> <div class="one-eight text-center"> <span>Total</span> </div> <div class="one-eight text-center"> <span>Remove</span> </div> </div>'
+                cartHTML = cartHTML + headHTML
+                for (const property in itemsInCart) {
+                    const imageURL = "/public/uploads/" + itemsInCart[property].image_name;
+                    const itemHTML = '<div class="product-cart"><div class="one-forth"><div class="product-img" style="background-image: url(' + imageURL + ');"></div><div class="display-tc"><h3>' + itemsInCart[property].name + '</h3></div></div><div class="one-eight text-center"><div class="display-tc"><del class="price">Tk ' + itemsInCart[property].withoutDiscountPrice + '</del>&emsp;<span class="price">Tk ' + itemsInCart[property].afterDiscountPrice + '</span> </div> </div> <div class="one-eight text-center"> <div class="display-tc"> <input type="number" id="' + itemsInCart[property].id + '" name="quantity" class="form-control input-number text-center" value="' + itemsInCart[property].qty + '" min="1" max="100"> </div> </div> <div class="one-eight text-center"> <div class="display-tc"> <span class="price">Tk ' + itemsInCart[property].total.toFixed(2) + '</span> </div> </div> <div class="one-eight text-center"> <div class="display-tc"> <a href="javascript:void(0)" class="closed" id="' + itemsInCart[property].id + '"></a> </div> </div></div>'
+                    cartHTML += itemHTML
+                }
+                $('#cart-detail').html(cartHTML)
+                $('#sub_total').text('Tk ' + cartItems.additionalInfo.subTotal.toFixed(2))
+                $('#delivery_charge').text('Tk ' + cartItems.additionalInfo.deliveryCharge)
+                $('#discount').text('Tk ' + cartItems.additionalInfo.discount.toFixed(2))
+                $('#total').text('Tk ' + (cartItems.additionalInfo.subTotal + cartItems.additionalInfo.deliveryCharge - cartItems.additionalInfo.discount).toFixed(2))
+                if (cartItems.appliedCoupon === true) {
+                    $('#apply-coupon-area').css('display', 'none')
+                    $('#addiitonal-info').css('float', 'right')
+                    $('#proceed2checkout').attr('align', 'right');
+                    $('#proceed2checkout a').css({ "margin-top" : "15px", "margin-right" : "30px" })
+                }
+                $('#additional-things').css('display', 'block')
+            } else {
+                doTaskWhenCartEmpty()
+            }
+        }
+
+        window.setTimeout(hideLoader, 2000)
+
+        function updateNumberOfTheCart() {
+            console.log("Calling")
+            const cart = JSON.parse(localStorage.getItem('cart'))
+            const itemsInCart = cart['products']
+            $('#numOfProductsIntoCart').empty().text('[' + Object.keys(itemsInCart).length + ']')
+        }
+
+        if (localStorage.getItem('cart') === undefined || localStorage.getItem('cart') === null) {
+            const cartItems = {
+                products: {},
+                appliedCoupon: false,
+                additionalInfo: {subTotal: 0, deliveryCharge: 10, discount: 0, total: 0},
+                checkout: false,
+                orderComplete: false
+            }
+            localStorage.setItem("cart", JSON.stringify(cartItems));
+
+            updateNumberOfTheCart()
+        } else {
+            updateNumberOfTheCart()
+        }
+
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        function doNecessaryTasksAfterSuccess(data) {
+            // console.log(data)
+
+            let cartItems = JSON.parse(localStorage.getItem('cart'))
+            cartItems['products'][data.id] = data
+            let subTotal = 0
+            for (const property in cartItems['products']) {
+                subTotal = subTotal + cartItems['products'][property]['total']
+            }
+            cartItems['additionalInfo']['subTotal'] = subTotal
+            cartItems['additionalInfo']['total'] = cartItems['additionalInfo']['subTotal'] - cartItems['additionalInfo']['discount']
+            localStorage.setItem("cart", JSON.stringify(cartItems));
+
+            // showLoader()
+            // window.setTimeout(hideLoader, 2000)
+
+            readyCartItems()
+
+            updateNumberOfTheCart()
+
+            Toast.fire({
+                icon: 'success',
+                title: "Updated the cart successfully"
+            })
+        }
+
+        function doNecessaryTasksAfterErr(msg) {
+            Toast.fire({
+                icon: 'error',
+                title: msg
+            })
+        }
+
+        function addToCart(productId, qty) {
+            $.ajax({
+                url: '/api/add-to-cart',
+                type: 'POST',
+                cache: false,
+                data: {productId, qty},
+                success: function (data) {
+                    // console.log("Success")
+                    console.log(data)
+
+                    const withoutDiscountPrice = data.data.sale_price;
+                    const afterDiscountPrice = data.data.sale_price - (data.data.sale_price * (data.data.discount / 100));
+
+                    delete data.data.category_id
+                    delete data.data.description
+                    delete data.data.discount
+                    delete data.data.price
+                    delete data.data.unit
+                    delete data.data.sale_price
+                    delete data.data.main_category_id
+
+                    data.data.withoutDiscountPrice = withoutDiscountPrice;
+                    data.data.afterDiscountPrice = afterDiscountPrice;
+                    data.data.qty = qty;
+                    data.data.total = data.data.afterDiscountPrice * data.data.qty
+
+                    doNecessaryTasksAfterSuccess(data.data)
+                }
+                , error: function (err) {
+                    // console.log(err.responseJSON)
+                    doNecessaryTasksAfterErr(err.responseJSON.msg)
+                }
+            });
+        }
+
+        $(document).on('change', 'input[type="number"]', function () {
+            // console.log("...")
+            const _this = $(this);
+            const id = _this.attr('id');
+            const val = _this.val();
+
+            addToCart(id, val)
+        })
+
+        $(document).on('click', 'a.closed', function () {
+            // console.log("...")
+            const _this = $(this);
+            const id = _this.attr('id');
+
+            let cartItems = JSON.parse(localStorage.getItem('cart'))
+            delete cartItems['products'][id]
+            let subTotal = 0
+            for (const property in cartItems['products']) {
+                subTotal = subTotal + cartItems['products'][property]['total']
+            }
+            cartItems['additionalInfo']['subTotal'] = subTotal
+            cartItems['additionalInfo']['total'] = cartItems['additionalInfo']['subTotal'] - cartItems['additionalInfo']['discount']
+            localStorage.setItem("cart", JSON.stringify(cartItems));
+
+            readyCartItems();
+
+            Toast.fire({
+                icon: 'success',
+                title: "Updated the cart successfully"
+            })
+        })
+
+        function applyCoupon(code) {
+            let cartItems = JSON.parse(localStorage.getItem('cart'))
+
+            $.ajax({
+                url: '/api/apply-coupon',
+                type: 'POST',
+                cache: false,
+                data: {code: code, total: cartItems['additionalInfo']['subTotal']},
+                success: function (data) {
+                    // console.log("Success")
+                    console.log(data)
+
+                    cartItems['additionalInfo']['discount'] = cartItems['additionalInfo']['total'] * data.data
+                    cartItems['additionalInfo']['total'] = cartItems['additionalInfo']['total'] - cartItems['additionalInfo']['discount']
+                    cartItems['appliedCoupon'] = true
+
+                    localStorage.setItem("cart", JSON.stringify(cartItems));
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: "Coupon applied successfully"
+                    })
+
+                    readyCartItems()
+                }
+                , error: function (err) {
+                    // console.log(err.responseJSON)
+                    doNecessaryTasksAfterErr(err.responseJSON.msg)
+                }
+            });
+        }
+
+        $('#apply-coupon-btn').on('click', function () {
+            // console.log("...")
+            $('#coupon-val-err-msg').text('')
+            const _this = $(this);
+            const code = $("input[name='coupon']").val();
+
+            if (code) {
+                applyCoupon(code)
+            } else {
+                $('#coupon-val-err-msg').text('This field is required.')
+            }
+        })
+    });
+</script>

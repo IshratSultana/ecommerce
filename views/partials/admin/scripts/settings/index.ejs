@@ -1,0 +1,337 @@
+<!-- jQuery -->
+<script src="/public/plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="/public/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 -->
+<script src="/public/plugins/select2/js/select2.full.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script>
+    $(function () {
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        document.getElementById("logo").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("image-logo").src = e.target.result;
+                // document.getElementById("image").style.width = "600px";
+                // document.getElementById("image").style.height = "300px";
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+
+        document.getElementById("banner").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("image-banner").src = e.target.result;
+                // document.getElementById("image").style.width = "600px";
+                // document.getElementById("image").style.height = "300px";
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+
+        $("#edit-site-settings").click(function () {
+            $.ajax({
+                type: 'GET',
+                url: '/api/admin/site-settings/',
+                success: function (res) {
+                    console.log(res)
+                    if (Object.keys(res.data).length !== 0) {
+                        $('#site-settings-form textarea[name="footer"]').val(res.data.footer)
+                        $('#image-logo').attr('src', '/public/uploads/' + res.data.logo_name)
+                        $('#image-banner').attr('src', '/public/uploads/' + res.data.banner_name)
+                        $('#site-settings-form input[name="uploaded_logo_name"]').val(res.data.logo_name)
+                        $('#site-settings-form input[name="uploaded_banner_name"]').val(res.data.banner_name)
+                        $('#site-settings-form input[name="id"]').val(res.data.id)
+                    }
+                    $('#change-site-settings').modal('show');
+
+                }, error: function (err) {
+                    console.log(err);
+                }
+            });
+        });
+
+        function doNecessaryTasksAfterSuccess(msg, eventType) {
+            if (eventType === "change") {
+                $('#change-site-settings').modal('hide');
+            } else if (eventType === "create") {
+                $('#add-staff-form').modal('hide');
+            } else if(eventType === 'create-prod') {
+                $('#add-prod').modal('hide')
+            } else if(eventType === 'create-cat') {
+                $('#add-cat').modal('hide')
+            } else if(eventType === 'create-camp') {
+                $('#create-camp').modal('hide')
+            } else if(eventType === 'create-payment-gateway') {
+                $('#create-payment-gateway').modal('hide')
+            }
+
+            Toast.fire({
+                icon: 'success',
+                title: msg
+            })
+            setTimeout(function () {
+                window.location.reload();
+            }, 2000)
+        }
+
+        $("#site-settings-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/site-settings',
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "change")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-edit").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "file-up-logo":
+                                $("#logo-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            case "file-up-banner":
+                                $("#banner-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        $("#add-staff-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/staffs',
+                type: 'POST',
+                data: $('#add-staff-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "email-exist":
+                                $("#email-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        document.getElementById("file-prod").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("image-prod").src = e.target.result;
+                // document.getElementById("image").style.width = "600px";
+                // document.getElementById("image").style.height = "300px";
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+
+        document.getElementById("file-cat").onchange = function () {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("image-cat").src = e.target.result;
+                // document.getElementById("image").style.width = "600px";
+                // document.getElementById("image").style.height = "300px";
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        };
+
+        $("#add-product-form").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/products',
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create-prod")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "file-up":
+                                $("#file-prod-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        $("#add-cat-form").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/sub_categories',
+                type: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create-cat")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg").text(error.msg)
+                            })
+                        }
+                    } else if (err.responseJSON.type !== undefined) {
+                        switch (err.responseJSON.type) {
+                            case "file-up":
+                                $("#file-cat-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            case "slug":
+                                $('#' + err.responseJSON.type + "-val-err-msg").text(err.responseJSON.message)
+                                break;
+                            default:
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: err.responseJSON.message
+                                })
+                        }
+                    }
+                }
+            });
+        });
+
+        $("#add-camp-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/discounts',
+                type: 'POST',
+                data: $('#add-camp-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create-camp")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-camp").text(error.msg)
+                            })
+                        }
+                    }
+                }
+            });
+        });
+
+        $("#add-payment-form").submit(function (e) {
+            $('small.text-danger').text('')
+            e.preventDefault();
+            $.ajax({
+                url: '/api/admin/payment-methods',
+                type: 'POST',
+                data: $('#add-payment-form').serialize(),
+                success: function (data) {
+                    // console.log("Success")
+                    doNecessaryTasksAfterSuccess(data.message, "create-payment-gateway")
+                }
+                , error: function (err) {
+                    console.log("Err")
+                    console.log(err.responseJSON)
+
+                    if (err.responseJSON.message === "Validation failure!") {
+                        if (err.responseJSON.errors.length > 0) {
+                            err.responseJSON.errors.map(error => {
+                                $('#' + error.param + "-val-err-msg-camp").text(error.msg)
+                            })
+                        }
+                    }
+                }
+            });
+        });
+    })
+</script>
+

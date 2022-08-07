@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= (typeof title != "undefined" ? "E-com | " + title : "E-com") %></title>
+<?php ?>
+    <% if(url.indexOf('admin') > -1){ %>
+        <% if(url === "/admin/login"){ %>
+            <%- include('partials/admin/head/login') %>
+        <% } else if(url === "/admin/dashboard" || url === "/admin/profile"){ %>
+            <%- include('partials/admin/head/dashboard') %>
+        <% } else if(url === "/admin/sub_categories"){ %>
+            <%- include('partials/admin/head/category/index') %>
+        <% } else if(url === "/admin/products"){ %>
+            <%- include('partials/admin/head/product/index') %>
+        <% } else if(url === "/admin/orders"){ %>
+            <%- include('partials/admin/head/order/index') %>
+        <% } else if(url === "/admin/customers"){ %>
+            <%- include('partials/admin/head/customer/index') %>
+        <% } else if(url === "/admin/discounts"){ %>
+            <%- include('partials/admin/head/coupon/index') %>
+        <% } else if(url === "/admin/settings"){ %>
+            <%- include('partials/admin/head/settings/index') %>
+        <% } else if(url === "/admin/settings/staff-members"){ %>
+            <%- include('partials/admin/head/settings/staff-members') %>
+        <% } else if(url === "/admin/profile"){ %>
+            <%- include('partials/admin/head/profile') %>
+        <% } %>
+        <!-- SweetAlert2 -->
+        <link rel="stylesheet" href="/public/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <% } else { %>
+        <% if(url === "/" || url === "/login" || url === "/profile"){ %>
+            <%- include('partials/customer/head/home') %>
+        <% } else if(url.indexOf('shop') > -1){ %>
+            <%- include('partials/customer/head/shop') %>
+        <% } else if(url.indexOf('products') > -1){ %>
+            <%- include('partials/customer/head/product-detail') %>
+        <% } else if(url === "/cart"){ %>
+            <%- include('partials/customer/head/cart') %>
+        <% } else if(url === "/checkout"){ %>
+            <%- include('partials/customer/head/checkout') %>
+        <% } else if(url === "/order-complete"){ %>
+            <%- include('partials/customer/head/order-complete') %>
+        <% } %>
+
+        <% if(url.indexOf('products') > -1){ %>
+            <%- include('partials/customer/head/addToCartFromProductDetail') %>
+        <% } else { %>
+            <%- include('partials/customer/head/addToCartFromAnywhere') %>
+        <% } %>
+    <% } %>
+</head>
+<% if(url.indexOf('admin') > -1){ %>
+    <body class="hold-transition <%= url === '/admin/login' ? 'login-page' : 'sidebar-mini layout-fixed' %>">
+    <%- body %>
+    <% if(url === "/admin/login"){ %>
+        <%- include('partials/admin/scripts/login') %>
+    <% } else if(url === "/admin/dashboard"){ %>
+        <%- include('partials/admin/scripts/dashboard') %>
+    <% } else if(url === "/admin/sub_categories"){ %>
+        <%- include('partials/admin/scripts/category/index') %>
+    <% } else if(url === "/admin/products"){ %>
+        <%- include('partials/admin/scripts/product/index') %>
+    <% } else if(url === "/admin/orders"){ %>
+        <%- include('partials/admin/scripts/order/index') %>
+    <% } else if(url === "/admin/customers"){ %>
+        <%- include('partials/admin/scripts/customer/index') %>
+    <% } else if(url === "/admin/discounts"){ %>
+        <%- include('partials/admin/scripts/coupon/index') %>
+    <% } else if(url === "/admin/settings"){ %>
+        <%- include('partials/admin/scripts/settings/index') %>
+    <% } else if(url === "/admin/settings/staff-members"){ %>
+        <%- include('partials/admin/scripts/settings/staff-members') %>
+    <% } else if(url === "/admin/profile"){ %>
+        <%- include('partials/admin/scripts/profile') %>
+    <% } %>
+    </body>
+<% } else { %>
+    <body>
+    <div class="colorlib-loader"></div>
+    <div id="page">
+        <%- body %>
+        <% if(url === "/" || url === "/login" || url === "/profile"){ %>
+            <%- include('partials/customer/scripts/home') %>
+        <% } else if(url.indexOf('shop') > -1){ %>
+            <%- include('partials/customer/scripts/shop') %>
+        <% } else if(url.indexOf('products') > -1){ %>
+            <%- include('partials/customer/scripts/product-detail') %>
+        <% } else if(url === "/cart"){ %>
+            <%- include('partials/customer/scripts/cart') %>
+        <% } else if(url === "/checkout"){ %>
+            <%- include('partials/customer/scripts/checkout') %>
+        <% } else if(url === "/order-complete"){ %>
+            <%- include('partials/customer/scripts/order-complete') %>
+        <% } %>
+
+        <% if(url.indexOf('products') > -1){ %>
+            <%- include('partials/customer/scripts/addToCartFromProductDetail') %>
+        <% } else { %>
+            <%- include('partials/customer/scripts/addToCartFromAnywhere') %>
+        <% } %>
+    </div>
+    </body>
+<% } %>
+</html>

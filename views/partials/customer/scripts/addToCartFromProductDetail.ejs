@@ -1,0 +1,113 @@
+<!-- SweetAlert2 -->
+<script src="/public/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script>
+
+    function updateNumberOfTheCart() {
+        console.log("Calling")
+        const cart = JSON.parse(localStorage.getItem('cart'))
+        const itemsInCart = cart['products']
+        $('#numOfProductsIntoCart').text('[' + Object.keys(itemsInCart).length + ']')
+    }
+
+    if (localStorage.getItem('cart') === undefined || localStorage.getItem('cart') === null) {
+        const cartItems = {
+            products: {},
+            appliedCoupon: false,
+            additionalInfo: {subTotal: 0, deliveryCharge: 10, discount: 0, total: 0},
+            checkout: false,
+            orderComplete: false
+        }
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+
+        updateNumberOfTheCart()
+    } else {
+        updateNumberOfTheCart()
+    }
+
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    function doNecessaryTasksAfterSuccess(data) {
+        console.log(data)
+
+        let cartItems = JSON.parse(localStorage.getItem('cart'))
+        cartItems['products'][data.id] = data
+        let subTotal = 0
+        for (const property in cartItems['products']) {
+            subTotal = subTotal + cartItems['products'][property]['total']
+        }
+        cartItems['additionalInfo']['subTotal'] = subTotal
+        cartItems['additionalInfo']['total'] = cartItems['additionalInfo']['subTotal'] - cartItems['additionalInfo']['discount'] + cartItems['additionalInfo']['deliveryCharge']
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+
+        updateNumberOfTheCart()
+
+        Toast.fire({
+            icon: 'success',
+            title: "Added to cart"
+        })
+    }
+
+    function doNecessaryTasksAfterErr(msg) {
+        Toast.fire({
+            icon: 'error',
+            title: msg
+        })
+    }
+
+    function addToCart(productId, qty) {
+        $.ajax({
+            url: '/api/add-to-cart',
+            type: 'POST',
+            cache: false,
+            data: {productId, qty},
+            success: function (data) {
+                // console.log("Success")
+                console.log(data)
+
+                const withoutDiscountPrice = data.data.sale_price;
+                const afterDiscountPrice = data.data.sale_price - (data.data.sale_price * (data.data.discount / 100));
+
+                delete data.data.category_id
+                delete data.data.description
+                delete data.data.discount
+                delete data.data.price
+                delete data.data.unit
+                delete data.data.sale_price
+                delete data.data.main_category_id
+
+                data.data.withoutDiscountPrice = withoutDiscountPrice;
+                data.data.afterDiscountPrice = afterDiscountPrice;
+                data.data.qty = qty;
+                data.data.total = data.data.afterDiscountPrice * data.data.qty
+
+                doNecessaryTasksAfterSuccess(data.data)
+            }
+            , error: function (err) {
+                // console.log(err.responseJSON)
+                doNecessaryTasksAfterErr(err.responseJSON.msg)
+            }
+        });
+    }
+
+    $('.btn-addtocart').click(function () {
+        const productId = $(this).attr("id");
+        // console.log(id)
+        const qty = $('#quantity').val();
+        if (qty > 0) {
+            addToCart(productId, qty)
+        } else {
+            doNecessaryTasksAfterErr("Invalid quantity. Please choose at least greater than 0.")
+        }
+    })
+
+    $('.addtocart').click(function () {
+        const productId = $(this).attr("id");
+        // console.log(id)
+        addToCart(productId, 1)
+    })
+</script>
